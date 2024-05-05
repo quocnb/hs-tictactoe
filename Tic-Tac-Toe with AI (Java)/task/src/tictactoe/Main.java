@@ -1,5 +1,7 @@
 package tictactoe;
 
+import com.sun.source.tree.BreakTree;
+
 import java.util.Scanner;
 
 public class Main {
@@ -7,14 +9,19 @@ public class Main {
     static Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
-        System.out.print("Enter the cells: ");
-        String input = scanner.nextLine().trim();
-        ticTacToe = new TicTacToe(3, input);
+        ticTacToe = new TicTacToe();
         ticTacToe.print();
-        readCoordinates();
+        while (true) {
+            if (readCoordinates()) {
+                return;
+            }
+            if (aiTurn()) {
+                return;
+            }
+        }
     }
 
-    static void readCoordinates() {
+    static boolean readCoordinates() {
         while (true) {
             System.out.print("Enter the coordinates: > ");
             String input = scanner.nextLine();
@@ -27,11 +34,14 @@ public class Main {
             try {
                 TicTacToe.Result result = ticTacToe.set(row, column);
                 ticTacToe.print();
+                if (result == TicTacToe.Result.NotFinish) {
+                    return false;
+                }
                 String msg = switch (result) {
                     case XWin -> "X wins";
                     case OWin -> "O wins";
                     case Draw -> "Draw";
-                    case NotFinish -> "Game not finished";
+                    case NotFinish -> null;
                 };
                 System.out.println(msg);
                 break;
@@ -39,6 +49,21 @@ public class Main {
                 System.out.println(e.getMessage());
             }
         }
+        return true;
+    }
 
+    static boolean aiTurn() {
+        String msg = switch (ticTacToe.autoGenWithEasyMode()) {
+            case XWin -> "X wins";
+            case OWin -> "O wins";
+            case Draw -> "Draw";
+            case NotFinish -> null;
+        };
+        ticTacToe.print();
+        if (msg == null) {
+            return false;
+        }
+        System.out.println(msg);
+        return true;
     }
 }

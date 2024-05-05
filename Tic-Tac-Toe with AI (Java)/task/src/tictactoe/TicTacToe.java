@@ -1,5 +1,7 @@
 package tictactoe;
 
+import java.util.Random;
+
 public class TicTacToe {
     public enum Result {
         XWin, Draw, OWin, NotFinish
@@ -12,6 +14,11 @@ public class TicTacToe {
     final private int[][] table;
     private int xCount = 0;
     private int oCount = 0;
+
+    TicTacToe() {
+        tableSize = 3;
+        table = new int[3][3];
+    }
 
     TicTacToe(int size, String initData) {
         assert initData.length() == size * size;
@@ -51,7 +58,7 @@ public class TicTacToe {
             builder.append("|").append("\n");
         }
         builder.append("-".repeat(lineLength)).append("\n");
-        System.out.println(builder);
+        System.out.print(builder);
     }
 
     Result set(int row, int col) throws IllegalArgumentException {
@@ -98,5 +105,22 @@ public class TicTacToe {
             return Result.OWin;
         }
         return totalResult == 0 ? Result.NotFinish : Result.Draw;
+    }
+
+    Result autoGenWithEasyMode() {
+        System.out.println("Making move level \"easy\"");
+        while (true) {
+            int r = new Random().nextInt(tableSize);
+            int c = new Random().nextInt(tableSize);
+            if (table[r][c] == 0) {
+                table[r][c] = 2;
+            } else if (table[c][r] == 0) {
+                table[c][r] = 2;
+            } else {
+                continue;
+            }
+            break;
+        }
+        return checkResult();
     }
 }
