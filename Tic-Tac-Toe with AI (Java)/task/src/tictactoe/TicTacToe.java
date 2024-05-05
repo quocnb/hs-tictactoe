@@ -61,7 +61,7 @@ public class TicTacToe {
         System.out.print(builder);
     }
 
-    Result set(int row, int col) throws IllegalArgumentException {
+    Result set(int row, int col, boolean xPlayer) throws IllegalArgumentException {
         if (row < 1 || row > tableSize || col < 1 || col > tableSize) {
             String message = String.format("Coordinates should be from 1 to %d!", tableSize);
             throw new IllegalArgumentException(message);
@@ -69,7 +69,7 @@ public class TicTacToe {
         if (table[row - 1][col - 1] != 0) {
             throw new IllegalArgumentException("This cell is occupied! Choose another one!");
         }
-        table[row - 1][col - 1] = xCount > oCount ? 2 : 1;
+        table[row - 1][col - 1] = xPlayer ? 1 : 2;
         return checkResult();
     }
 
@@ -107,15 +107,15 @@ public class TicTacToe {
         return totalResult == 0 ? Result.NotFinish : Result.Draw;
     }
 
-    Result autoGenWithEasyMode() {
+    Result autoGenWithEasyMode(boolean xPlayer) {
         System.out.println("Making move level \"easy\"");
         while (true) {
             int r = new Random().nextInt(tableSize);
             int c = new Random().nextInt(tableSize);
             if (table[r][c] == 0) {
-                table[r][c] = 2;
+                table[r][c] = xPlayer ? 1 : 2;
             } else if (table[c][r] == 0) {
-                table[c][r] = 2;
+                table[c][r] = xPlayer ? 1 : 2;
             } else {
                 continue;
             }
