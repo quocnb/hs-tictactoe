@@ -472,6 +472,9 @@ files:
   - name: src/tictactoe/Player.java
     visible: true
     learner_created: true
+  - name: src/tictactoe/HardAi.java
+    visible: true
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/7437#comment
 status: Solved
 feedback:

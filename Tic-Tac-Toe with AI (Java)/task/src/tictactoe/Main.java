@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Main {
     enum PlayerCommand {
-        User, AI_Easy, AI_Medium;
+        User, AI_Easy, AI_Medium, AI_Hard;
 
         static public Player of(String player, char sign) {
             PlayerCommand pc = null;
@@ -21,6 +21,7 @@ public class Main {
                 case User -> new User(sign);
                 case AI_Easy -> new EasyAi(sign);
                 case AI_Medium -> new MediumAi(sign);
+                case AI_Hard -> new HardAi(sign);
             };
         }
 
@@ -29,6 +30,7 @@ public class Main {
                 case User -> "user";
                 case AI_Easy -> "easy";
                 case AI_Medium -> "medium";
+                case AI_Hard -> "hard";
             };
         }
     }

@@ -374,6 +374,299 @@ files:
           }
       }
     learner_created: false
+  - name: src/tictactoe/Board.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      import java.util.Random;
+      
+      public class Board {
+          private static final char EMPTY = ' ';
+          static final char PLAYER_X = 'X';
+          static final char PLAYER_O = 'O';
+      
+          final private char[][] board = new char[3][3];
+      
+          public Board() {
+              for (int i = 0; i < 3; i++) {
+                  for (int j = 0; j < 3; j++) {
+                      board[i][j] = EMPTY;
+                  }
+              }
+          }
+      
+          void print() {
+              StringBuilder builder = new StringBuilder();
+              int lineLength = board.length + (board.length + 1) + 2;
+              builder.append("-".repeat(lineLength)).append("\n");
+              for (int row = 0; row < board.length; row++) {
+                  builder.append("| ");
+                  for (int column = 0; column < board.length; column++) {
+                      builder.append(board[row][column]).append(" ");
+                  }
+                  builder.append("|").append("\n");
+              }
+              builder.append("-".repeat(lineLength)).append("\n");
+              System.out.print(builder);
+          }
+      
+          boolean isWin(char player) {
+              // Check row - column
+              for (int i = 0; i < 3; i++) {
+                  if ((board[i][0] == player && board[i][1] == player && board[i][2] == player) ||
+                          (board[0][i] == player && board[1][i] == player && board[2][i] == player)) {
+                      return true;
+                  }
+              }
+              // Check cross
+              return (board[0][0] == player && board[1][1] == player && board[2][2] == player) ||
+                      (board[0][2] == player && board[1][1] == player && board[2][0] == player);
+          }
+      
+          boolean canMove(int row, int col) {
+              return board[row][col] == EMPTY;
+          }
+      
+          void move(int row, int col, char sign) {
+              board[row][col] = sign;
+          }
+      
+          boolean canWin(int row, int col, char sign) {
+              move(row, col, sign);
+              boolean canWin = isWin(sign);
+              reset(row, col);
+              return canWin;
+          }
+      
+          void random(char sign) {
+              while (true) {
+                  int r = new Random().nextInt(3);
+                  int c = new Random().nextInt(3);
+                  if (canMove(r, c)) {
+                      move(r, c, sign);
+                      return;
+                  }
+              }
+          }
+      
+          void reset(int row, int col) {
+              board[row][col] = EMPTY;
+          }
+      
+          boolean isFull() {
+              for (char[] row : board) {
+                  for (char cell : row) {
+                      if (cell == EMPTY) {
+                          return false;
+                      }
+                  }
+              }
+              return true;
+          }
+      }
+    learner_created: true
+  - name: src/tictactoe/MediumAi.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      public class MediumAi extends Player {
+      
+          public MediumAi(char sign) {
+              this.sign = sign;
+          }
+      
+          @Override
+          void move(Board board) {
+              System.out.println("Making move level \"medium\"");
+              int bestRow = -1, bestCol = -1;
+              char againstChar = sign == Board.PLAYER_X ? Board.PLAYER_O : Board.PLAYER_X;
+      
+              for (int i = 0; i < 3; i++) {
+                  for (int j = 0; j < 3; j++) {
+                      if (!board.canMove(i, j)) {
+                          continue;
+                      }
+                      if (board.canWin(i, j, sign)) {
+                          board.move(i, j, sign);
+                          return;
+                      }
+                      if (bestRow == -1 && board.canWin(i, j, againstChar)) {
+                          bestRow = i;
+                          bestCol = j;
+                      }
+                  }
+              }
+              // Can't win
+              // Otherwise, random move
+              if (bestRow == -1) {
+                  board.random(sign);
+              } else {
+                  board.move(bestRow, bestCol, sign);
+              }
+          }
+      }
+    learner_created: true
+  - name: src/tictactoe/Player.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      public class Player {
+          char sign;
+      
+          void move(Board board) {}
+      }
+    learner_created: true
+  - name: src/tictactoe/EasyAi.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      import java.util.Random;
+      
+      public class EasyAi extends Player {
+      
+          public EasyAi(char sign) {
+              this.sign = sign;
+          }
+      
+          @Override
+          void move(Board board) {
+              System.out.println("Making move level \"easy\"");
+              board.random(sign);
+          }
+      }
+    learner_created: true
+  - name: src/tictactoe/User.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      import java.util.Scanner;
+      
+      public class User extends Player {
+      
+          public User(char sign) {
+              this.sign = sign;
+          }
+      
+          @Override
+          void move(Board board) {
+              Scanner scanner = new Scanner(System.in);
+              while (true) {
+                  System.out.print("Enter the coordinates: ");
+                  String input = scanner.nextLine();
+                  if (!input.matches("\\d+ \\d+")) {
+                      System.out.println("You should enter numbers!");
+                      continue;
+                  }
+                  int row = Integer.parseInt(input.split(" ")[0]) - 1;
+                  int column = Integer.parseInt(input.split(" ")[1]) - 1;
+                  if (row < 0 || row > 2 || column < 0 || column > 2) {
+                      System.out.println("Coordinates should be from 1 to 3!");
+                      continue;
+                  }
+                  if (!board.canMove(row, column)) {
+                      System.out.println("This cell is occupied! Choose another one!");
+                  }
+                  board.move(row, column, sign);
+                  break;
+              }
+          }
+      }
+    learner_created: true
+  - name: src/tictactoe/HardAi.java
+    visible: true
+    text: |
+      package tictactoe;
+      
+      public class HardAi extends Player {
+          public HardAi(char sign) {
+              this.sign = sign;
+          }
+      
+          @Override
+          void move(Board board) {
+              int bestRow = -1;
+              int bestCol = -1;
+              int bestScore = sign == Board.PLAYER_X ? Integer.MIN_VALUE : Integer.MAX_VALUE;
+              for (int i = 0; i < 3; i++) {
+                  for (int j = 0; j < 3; j++) {
+                      if (board.canMove(i, j)) {
+                          board.move(i, j, sign);
+                          if (sign == Board.PLAYER_X) {
+                              int moveScore = minimax(board, 5, false);
+                              if (moveScore > bestScore) {
+                                  bestScore = moveScore;
+                                  bestRow = i;
+                                  bestCol = j;
+                              }
+                          } else {
+                              int moveScore = minimax(board, 5, true);
+                              if (moveScore < bestScore) {
+                                  bestScore = moveScore;
+                                  bestRow = i;
+                                  bestCol = j;
+                              }
+                          }
+                          board.reset(i, j);
+      
+                      }
+                  }
+              }
+              board.move(bestRow, bestCol, sign);
+          }
+      
+          private static int evaluate(Board board) {
+              if (board.isWin(Board.PLAYER_X)) {
+                  return 10;
+              } else if (board.isWin(Board.PLAYER_O)) {
+                  return -10;
+              } else {
+                  return 0;
+              }
+          }
+      
+          private int minimax(Board board, int depth, boolean isMaximizing) {
+              int score = evaluate(board);
+              if (score == 10 || score == -10 || board.isFull() || depth == 0) {
+                  return score;
+              }
+      
+              int bestScore;
+              if (isMaximizing) {
+                  bestScore = Integer.MIN_VALUE;
+                  for (int i = 0; i < 3; i++) {
+                      for (int j = 0; j < 3; j++) {
+                          if (board.canMove(i, j)) {
+                              board.move(i, j, Board.PLAYER_X);
+                              bestScore = Math.max(bestScore, minimax(board, depth - 1, false));
+                              board.reset(i, j);
+                          }
+                      }
+                  }
+              } else {
+                  bestScore = Integer.MAX_VALUE;
+                  for (int i = 0; i < 3; i++) {
+                      for (int j = 0; j < 3; j++) {
+                          if (board.canMove(i, j)) {
+                              board.move(i, j, Board.PLAYER_O);
+                              bestScore = Math.min(bestScore, minimax(board, depth - 1, true));
+                              board.reset(i, j);
+                          }
+                      }
+                  }
+              }
+              return bestScore;
+          }
+      }
+    learner_created: true
 feedback_link: https://hyperskill.org/learn/step/7438#comment
-status: Unchecked
+status: Solved
+feedback:
+  message: Well done! You've finished the project. Select a new project on <a href="https://hyperskill.org/projects">Hyperskill</a>
+    to continue learning.
+  time: "Mon, 06 May 2024 14:02:23 UTC"
 record: -1
