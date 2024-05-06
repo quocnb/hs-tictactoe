@@ -1,30 +1,39 @@
 package tictactoe;
 
-import com.sun.source.tree.BreakTree;
-
 import java.util.Scanner;
 
 public class Main {
-    enum Player {
-        User, AI_Easy;
+    enum PlayerCommand {
+        User, AI_Easy, AI_Medium;
 
-        static public Player of(String player) {
-            if (User.command().equals(player)) {
-                return User;
-            } else if (AI_Easy.command().equals(player)) {
-                return AI_Easy;
+        static public Player of(String player, char sign) {
+            PlayerCommand pc = null;
+            for (PlayerCommand p : PlayerCommand.values()) {
+                if (p.command().equals(player)) {
+                    pc = p;
+                    break;
+                }
             }
-            throw new IllegalArgumentException();
+            if (pc == null) {
+                throw new IllegalArgumentException();
+            }
+            return switch (pc) {
+                case User -> new User(sign);
+                case AI_Easy -> new EasyAi(sign);
+                case AI_Medium -> new MediumAi(sign);
+            };
         }
 
         String command() {
             return switch (this) {
                 case User -> "user";
                 case AI_Easy -> "easy";
+                case AI_Medium -> "medium";
             };
         }
     }
-    static TicTacToe ticTacToe;
+
+    static Board board;
     static Scanner scanner = new Scanner(System.in);
     static Player[] players;
 
@@ -38,7 +47,7 @@ public class Main {
 
     static boolean playGame() {
         while (true) {
-            System.out.print("Input command: > ");
+            System.out.print("Input command: ");
             String input = scanner.nextLine().trim();
             if ("exit".equals(input)) {
                 return true;
@@ -51,18 +60,18 @@ public class Main {
             }
         }
         // Game Start
-        ticTacToe = new TicTacToe();
-        ticTacToe.print();
+        board = new Board();
+        board.print();
         int turn = 0;
         while (true) {
-            if (players[turn] == Player.User) {
-                if (readCoordinates(turn == 0)) {
-                    return false;
-                }
-            } else {
-                if (aiTurn(turn == 0)) {
-                    return false;
-                }
+            players[turn].move(board);
+            board.print();
+            if (board.isWin(players[turn].sign)) {
+                System.out.println(players[turn].sign + " wins");
+                return false;
+            } else if (board.isFull()) {
+                System.out.println("Draw");
+                return false;
             }
             turn = (turn + 1) % 2;
         }
@@ -77,53 +86,7 @@ public class Main {
             throw new IllegalArgumentException();
         }
         players = new Player[2];
-        players[0] = Player.of(commands[1]);
-        players[1] = Player.of(commands[2]);
-    }
-
-    static boolean readCoordinates(boolean xPlayer) {
-        while (true) {
-            System.out.print("Enter the coordinates: > ");
-            String input = scanner.nextLine();
-            if (!input.matches("\\d+ \\d+")) {
-                System.out.println("You should enter numbers!");
-                continue;
-            }
-            int row = Integer.parseInt(input.split(" ")[0]);
-            int column = Integer.parseInt(input.split(" ")[1]);
-            try {
-                TicTacToe.Result result = ticTacToe.set(row, column, xPlayer);
-                ticTacToe.print();
-                if (result == TicTacToe.Result.NotFinish) {
-                    return false;
-                }
-                String msg = switch (result) {
-                    case XWin -> "X wins";
-                    case OWin -> "O wins";
-                    case Draw -> "Draw";
-                    case NotFinish -> null;
-                };
-                System.out.println(msg);
-                break;
-            } catch (IllegalArgumentException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-        return true;
-    }
-
-    static boolean aiTurn(boolean xPlayer) {
-        String msg = switch (ticTacToe.autoGenWithEasyMode(xPlayer)) {
-            case XWin -> "X wins";
-            case OWin -> "O wins";
-            case Draw -> "Draw";
-            case NotFinish -> null;
-        };
-        ticTacToe.print();
-        if (msg == null) {
-            return false;
-        }
-        System.out.println(msg);
-        return true;
+        players[0] = PlayerCommand.of(commands[1], Board.PLAYER_X);
+        players[1] = PlayerCommand.of(commands[2], Board.PLAYER_O);
     }
 }

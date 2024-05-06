@@ -247,7 +247,7 @@ files:
           }
       }
     learner_created: false
-  - name: src/tictactoe/TicTacToe.java
+  - name: src/tictactoe/Board.java
     visible: true
     text: |
       package tictactoe;

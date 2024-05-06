@@ -102,7 +102,7 @@ files:
           }
       }
     learner_created: false
-  - name: src/tictactoe/TicTacToe.java
+  - name: src/tictactoe/Board.java
     visible: true
     learner_created: true
 feedback_link: https://hyperskill.org/learn/step/7434#comment
